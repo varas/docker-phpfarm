@@ -40,10 +40,10 @@ COPY phpfarm /phpfarm/src/
 
 # compile, then delete sources (saves space)
 RUN cd /phpfarm/src && \
-    ./compile.sh 5.2.17 && \
-    ./compile.sh 5.3.29 && \
-    ./compile.sh 5.4.32 && \
-    ./compile.sh 5.5.16 && \
+#    ./compile.sh 5.2.17 && \
+#    ./compile.sh 5.3.29 && \
+#    ./compile.sh 5.4.32 && \
+#    ./compile.sh 5.5.16 && \
     ./compile.sh 5.6.1 && \
     rm -rf /phpfarm/src && \
     apt-get clean && \
@@ -55,7 +55,8 @@ RUN rm -rf /var/www/*
 COPY var-www /var/www/
 COPY apache  /etc/apache2/
 
-RUN a2ensite php-5.2 php-5.3 php-5.4 php-5.5 php-5.6
+RUN a2ensite php-5.6
+#RUN a2ensite php-5.2 php-5.3 php-5.4 php-5.5 php-5.6
 RUN a2enmod rewrite
 
 # set path
@@ -65,6 +66,13 @@ ENV PATH /phpfarm/inst/bin/:/usr/sbin:/usr/bin:/sbin:/bin
 EXPOSE 8052 8053 8054 8055 8056
 
 # run it
-COPY run.sh /run.sh
-ENTRYPOINT ["/bin/bash"]
-CMD ["/run.sh"]
+#COPY run.sh /run.sh
+RUN useradd --home /var/www --gid www-data -M -N --uid 33  www-data
+RUN echo "export APACHE_RUN_USER=www-data" >> /etc/apache2/envvars
+RUN chown -R www-data /var/lib/apache2
+RUN apache2ctl start
+
+# http://docs.docker.com/reference/commandline/cli/
+# Note: If CMD is used to provide default arguments for the ENTRYPOINT instruction, both the CMD and ENTRYPOINT instructions should be specified with the JSON array format.
+ENTRYPOINT /bin/bash
+CMD tail -f /var/log/apache2/error.log
