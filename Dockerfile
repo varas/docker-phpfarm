@@ -2,10 +2,9 @@
 # PHP Farm Docker image
 #
 
-# we use Debian as the host OS
-FROM debian:wheezy
+FROM ubuntu:14.04
 
-MAINTAINER Andreas Gohr, andi@splitbrain.org
+MAINTAINER @jhvaras
 
 # add some build tools
 RUN apt-get update && \
@@ -67,9 +66,9 @@ EXPOSE 8052 8053 8054 8055 8056
 
 # run it
 #COPY run.sh /run.sh
-RUN useradd --home /var/www --gid www-data -M -N --uid 33  www-data
-RUN echo "export APACHE_RUN_USER=www-data" >> /etc/apache2/envvars
-RUN chown -R www-data /var/lib/apache2
+#RUN useradd --home /var/www --gid www-data -M -N --uid 33  www-data
+#RUN echo "export APACHE_RUN_USER=www-data" >> /etc/apache2/envvars
+#RUN chown -R www-data /var/lib/apache2
 RUN apache2ctl start
 
 # http://docs.docker.com/reference/commandline/cli/
