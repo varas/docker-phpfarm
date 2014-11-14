@@ -52,7 +52,7 @@ RUN cd /phpfarm/src && \
 COPY var-www /var/www/
 COPY apache  /etc/apache2/
 
-#RUN a2ensite php-5.6
+RUN a2ensite php-5.6
 #RUN a2ensite php-5.2 php-5.3 php-5.4 php-5.5 php-5.6
 RUN a2enmod rewrite
 
@@ -60,7 +60,8 @@ ENV PATH /phpfarm/inst/bin/:/usr/sbin:/usr/bin:/sbin:/bin
 
 EXPOSE 8052 8053 8054 8055 8056
 
-RUN apache2ctl start
+#RUN apache2ctl start
+RUN service apache2 start
 
 # attach shared folder
 VOLUME ["/var/www/vhosts"]
