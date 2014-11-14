@@ -6,7 +6,6 @@ FROM ubuntu:14.04
 
 MAINTAINER @jhvaras
 
-# add some build tools
 RUN apt-get update && \
     apt-get install -y \
     apache2 \
@@ -48,8 +47,7 @@ RUN cd /phpfarm/src && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# reconfigure Apache
-RUN rm -rf /var/www/*
+#RUN rm -rf /var/www/*
 
 COPY var-www /var/www/
 COPY apache  /etc/apache2/
@@ -58,20 +56,18 @@ RUN a2ensite php-5.6
 #RUN a2ensite php-5.2 php-5.3 php-5.4 php-5.5 php-5.6
 RUN a2enmod rewrite
 
-# set path
 ENV PATH /phpfarm/inst/bin/:/usr/sbin:/usr/bin:/sbin:/bin
 
-# expose the ports
 EXPOSE 8052 8053 8054 8055 8056
 
-# run it
-#COPY run.sh /run.sh
-#RUN useradd --home /var/www --gid www-data -M -N --uid 33  www-data
-#RUN echo "export APACHE_RUN_USER=www-data" >> /etc/apache2/envvars
-#RUN chown -R www-data /var/lib/apache2
 RUN apache2ctl start
 
-# http://docs.docker.com/reference/commandline/cli/
+# attach shared folder
+VOLUME ["/var/www/vhosts"]
+#WORKDIR /var/www/vhosts
+
+# Cmd not pollutiing Entrypoint
 # Note: If CMD is used to provide default arguments for the ENTRYPOINT instruction, both the CMD and ENTRYPOINT instructions should be specified with the JSON array format.
+# http://docs.docker.com/reference/commandline/cli/
 ENTRYPOINT /bin/bash
 CMD tail -f /var/log/apache2/error.log
